@@ -9,48 +9,40 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # Check out the repository
       - name: Checkout repository
         uses: actions/checkout@v2
 
-      # used to cache dependencies with a timeout
-      - name: Get Date
-        id: get-date
-        run: |
-          echo "::set-output name=date::$(/bin/date -u "+%Y%m%d")"
-        shell: bash
-
-      # Cache Buildozer global directory
+      # Cache Buildozer dependencies
       - name: Cache Buildozer global directory
         uses: actions/cache@v2
         with:
           path: .buildozer_global
-          key: buildozer-global-${{ hashFiles('buildozer.spec') }} # Replace with your path
-
-      # Cache Buildozer directory
-      - uses: actions/cache@v2
+          key: buildozer-global-${{ hashFiles('buildozer.spec') }}
+      
+      - name: Cache Buildozer directory
+        uses: actions/cache@v2
         with:
           path: .buildozer
-          key: ${{ runner.os }}-${{ steps.get-date.outputs.date }}-${{ hashFiles('buildozer.spec') }}
-
-      # Step to build the Docker image
-      - name: Build Docker image for Buildozer
+          key: ${{ runner.os }}-${{ hashFiles('buildozer.spec') }}
+      
+      # Install dependencies for Buildozer
+      - name: Install dependencies
         run: |
-          echo "Building Docker image for Buildozer..."
-          docker build -t buildozer-image /home/runner/work/_actions/ArtemSBulgakov/buildozer-action/v1
-        shell: bash
+          sudo apt-get update
+          sudo apt-get install -y python3-pip python3-setuptools python3-dev build-essential
+          pip install --upgrade pip
+          pip install buildozer
 
-      # Step to build with Buildozer
+      # Build with Buildozer
       - name: Build with Buildozer
-        uses: ArtemSBulgakov/buildozer-action@v1
-        id: buildozer
-        with:
-          command: buildozer android debug
-          buildozer_version: master
-          timeout: 600  # Set timeout to 10 minutes to prevent build timeout
+        run: |
+          buildozer android debug
+        working-directory: .
 
-      # Upload artifacts if build is successful
+      # Upload Buildozer output as an artifact
       - name: Upload artifacts
         uses: actions/upload-artifact@v2
         with:
           name: package
-          path: ${{ steps.buildozer.outputs.filename }}
+          path: bin/
