@@ -34,9 +34,10 @@ jobs:
         with:
           command: buildozer android debug
           buildozer_version: master
+          docker_image: kivy/buildozer:v1.0  # تحديد إصدار موثوق من الصورة
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4  # تم تحديث الإصدار إلى v4
+        uses: actions/upload-artifact@v2  # العودة إلى الإصدار v2
         with:
           name: package
           path: ${{ steps.buildozer.outputs.filename }}
