@@ -40,9 +40,9 @@ jobs:
           buildozer android debug
         working-directory: .
 
-      # Upload Buildozer output as an artifact
+      # Upload Buildozer output as an artifact using the latest version (v3)
       - name: Upload artifacts
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: package
           path: bin/
