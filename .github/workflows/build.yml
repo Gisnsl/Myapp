@@ -36,7 +36,7 @@ jobs:
           buildozer_version: master
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@v3  # تم تحديث الإصدار من v2 إلى v3
+        uses: actions/upload-artifact@v4  # تم تحديث الإصدار إلى v4
         with:
           name: package
           path: ${{ steps.buildozer.outputs.filename }}
